@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Message For You</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: #0a0a1a;
+        }
+
+        /* ===== STAGE 1: Dark Mysterious Screen ===== */
+        #stage1 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0f0a1a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 1.5s ease-out, visibility 1.5s ease-out;
+        }
+
+        #stage1.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Mysterious glow background particles */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(200, 100, 255, 0.3);
+            border-radius: 50%;
+            animation: float 8s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
+            50% { transform: translateY(-30px) translateX(20px); opacity: 0.8; }
+        }
+
+        /* First button styling */
+        #buttonStage1 {
+            background: radial-gradient(circle at 30% 30%, #ff00ff, #00ffff);
+            border: 2px solid #00ffff;
+            color: white;
+            padding: 20px 40px;
+            font-size: 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff, inset 0 0 20px rgba(0, 255, 255, 0.3);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #buttonStage1:hover {
+            box-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff, inset 0 0 30px rgba(0, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+
+        #buttonStage1:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== STAGE 2: Garden Scene ===== */
+        #stage2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #87ceeb 0%, #e0f6ff 50%, #90ee90 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 101;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 2s ease-out, visibility 2s ease-out;
+        }
+
+        #stage2.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Canvas for tulips */
+        #gardenCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* Second button in garden */
+        #buttonStage2 {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: none;
+            color: white;
+            padding: 15px 35px;
+            font-size: 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+            font-weight: bold;
+            position: absolute;
+            bottom: 50px;
+            right: 50px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            z-index: 102;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 3s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #buttonStage2:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.6);
+        }
+
+        #buttonStage2:active {
+            transform: translateY(-1px);
+        }
+
+        /* ===== STAGE 3: Bouquet Formation ===== */
+        #stage3 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #87ceeb 0%, #e0f6ff 50%, #90ee90 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 102;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1.5s ease-out, visibility 1.5s ease-out;
+        }
+
+        #stage3.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Bouquet container */
+        #bouquet {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            cursor: pointer;
+        }
+
+        /* Individual tulip in bouquet */
+        .tulip-bouquet {
+            position: absolute;
+            width: 40px;
+            height: 150px;
+            left: 50%;
+            bottom: 0;
+            transform-origin: bottom center;
+        }
+
+        /* ===== STAGE 4: Message Box ===== */
+        #messageContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 103;
+            opacity: 0;
+            visibility: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        #messageContainer.visible {
+            opacity: 1;
+            visibility: visible;
+            animation: fadeInMessage 0.8s ease-out;
+        }
+
+        @keyframes fadeInMessage {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        #messageBox {
+            background: linear-gradient(135deg, #fff0f5, #ffe4e1);
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), inset 0 0 30px rgba(255, 105, 180, 0.2);
+            border: 3px solid #ff69b4;
+            position: relative;
+            animation: messageBoxAppear 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes messageBoxAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotateY(20deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateY(0deg);
+            }
+        }
+
+        #messageBox h2 {
+            color: #ff1493;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #messageBox p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 30px;
+            word-wrap: break-word;
+        }
+
+        #closeMessageBtn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+
+        #closeMessageBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4);
+        }
+
+        /* Decorative hearts */
+        .heart {
+            position: absolute;
+            font-size: 24px;
+            animation: heartFloat 3s ease-in-out infinite;
+        }
+
+        .heart1 { top: 10px; left: 20px; animation-delay: 0s; }
+        .heart2 { top: 10px; right: 20px; animation-delay: 0.5s; }
+        .heart3 { bottom: 10px; left: 20px; animation-delay: 1s; }
+        .heart4 { bottom: 10px; right: 20px; animation-delay: 1.5s; }
+
+        @keyframes heartFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            #buttonStage1 {
+                padding: 15px 30px;
+                font-size: 18px;
+            }
+
+            #buttonStage2 {
+                padding: 12px 25px;
+                font-size: 14px;
+                right: 20px;
+                bottom: 30px;
+            }
+
+            #messageBox {
+                padding: 30px 25px;
+                max-width: 90%;
+            }
+
+            #messageBox h2 {
+                font-size: 22px;
+            }
+
+            #messageBox p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- STAGE 1: Dark Mysterious Screen -->
+    <div id="stage1">
+        <div style="position: relative; z-index: 10;">
+            <div id="particleContainer"></div>
+            <button id="buttonStage1">click me</button>
+        </div>
+    </div>
+
+    <!-- STAGE 2: Garden with Tulips -->
+    <div id="stage2">
+        <canvas id="gardenCanvas"></canvas>
+        <button id="buttonStage2">click me</button>
+    </div>
+
+    <!-- STAGE 3: Bouquet -->
+    <div id="stage3">
+        <div id="bouquet"></div>
+    </div>
+
+    <!-- STAGE 4: Message Box -->
+    <div id="messageContainer">
+        <div id="messageBox">
+            <div class="heart heart1">💕</div>
+            <div class="heart heart2">💕</div>
+            <div class="heart heart3">💕</div>
+            <div class="heart heart4">💕</div>
+            
+            <h2>I'm Sorry! 💗</h2>
+            <p>So Sorry Bittuuu betuuu babuuuu chotuu priyanshuu chikuuuuu yawll maaf krdeyy for my bad behavior I'm so so so sorry Betuuuuuu maaf krdeyy bccheyyy ywr meko please yawl bettu lob uhh yawll maaf krdeee pilisss</p>
+            <button id="closeMessageBtn">🌷 Thank You 🌷</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== STAGE 1: Initialize particles =====
+        function createParticles() {
+            const container = document.getElementById('particleContainer');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        // ===== STAGE 1 Button Click =====
+        document.getElementById('buttonStage1').addEventListener('click', function() {
+            document.getElementById('stage1').classList.add('hidden');
+            document.getElementById('stage2').classList.add('visible');
+            drawGarden();
+        });
+
+        // ===== STAGE 2: Draw Garden with Canvas =====
+        function drawGarden() {
+            const canvas = document.getElementById('gardenCanvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Draw grass
+            ctx.fillStyle = '#90ee90';
+            ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+
+            // Draw tulips
+            const tulipPositions = [
+                { x: 100, y: canvas.height * 0.55, hue: 0 },
+                { x: 200, y: canvas.height * 0.50, hue: 20 },
+                { x: 300, y: canvas.height * 0.52, hue: 340 },
+                { x: 400, y: canvas.height * 0.48, hue: 50 },
+                { x: 500, y: canvas.height * 0.51, hue: 280 },
+                { x: canvas.width - 100, y: canvas.height * 0.49, hue: 120 },
+                { x: canvas.width - 200, y: canvas.height * 0.54, hue: 350 },
+                { x: canvas.width - 300, y: canvas.height * 0.50, hue: 200 },
+                { x: canvas.width - 400, y: canvas.height * 0.52, hue: 30 },
+                { x: canvas.width - 500, y: canvas.height * 0.48, hue: 150 },
+                { x: canvas.width / 2 - 150, y: canvas.height * 0.50, hue: 270 },
+                { x: canvas.width / 2 + 150, y: canvas.height * 0.53, hue: 10 },
+            ];
+
+            tulipPositions.forEach((pos, index) => {
+                drawTulip(ctx, pos.x, pos.y, pos.hue, 0.3 + index * 0.05);
+            });
+
+            // Draw clouds
+            for (let i = 0; i < 5; i++) {
+                drawCloud(ctx, i * 250, 50 + Math.sin(i) * 30, 60);
+            }
+        }
+
+        function drawTulip(ctx, x, y, hue, duration) {
+            const startTime = Date.now();
+            
+            function animate() {
+                const elapsed = (Date.now() - startTime) / 1000;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Draw stem
+                ctx.strokeStyle = `hsl(120, 70%, ${40 + progress * 10}%)`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.quadraticCurveTo(x + 5, y + 30, x, y + 80);
+                ctx.stroke();
+
+                // Draw petals
+                const petalHeight = 30 * progress;
+                const colors = [
+                    `hsla(${hue}, 100%, 50%, ${0.8 * progress})`,
+                    `hsla(${hue + 20}, 100%, 55%, ${0.7 * progress})`,
+                    `hsla(${hue - 20}, 100%, 45%, ${0.8 * progress})`,
+                ];
+
+                // Left petal
+                ctx.fillStyle = colors[0];
+                ctx.beginPath();
+                ctx.ellipse(x - 10, y + petalHeight * 0.4, 6, petalHeight * 0.5, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Center petal
+                ctx.fillStyle = colors[1];
+                ctx.beginPath();
+                ctx.ellipse(x, y, 8, petalHeight * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Right petal
+                ctx.fillStyle = colors[2];
+                ctx.beginPath();
+                ctx.ellipse(x + 10, y + petalHeight * 0.4, 6, petalHeight * 0.5, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            }
+
+            animate();
+        }
+
+        function drawCloud(ctx, x, y, size) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.beginPath();
+            ctx.arc(x, y, size * 0.4, 0, Math.PI * 2);
+            ctx.arc(x + size * 0.3, y - size * 0.1, size * 0.5, 0, Math.PI * 2);
+            ctx.arc(x + size * 0.6, y, size * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // ===== STAGE 2 Button Click =====
+        document.getElementById('buttonStage2').addEventListener('click', function() {
+            document.getElementById('stage2').classList.remove('visible');
+            document.getElementById('stage3').classList.add('visible');
+            createBouquet();
+        });
+
+        // ===== STAGE 3: Create Bouquet =====
+        function createBouquet() {
+            const bouquet = document.getElementById('bouquet');
+            bouquet.innerHTML = '';
+
+            const tulipCount = 12;
+            const positions = [];
+
+            for (let i = 0; i < tulipCount; i++) {
+                const angle = (i / tulipCount) * Math.PI * 2;
+                const radius = 80;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                positions.push({ x, y, angle });
+            }
+
+            positions.forEach((pos, index) => {
+                const tulipEl = document.createElement('div');
+                tulipEl.className = 'tulip-bouquet';
+                tulipEl.innerHTML = `
+                    <svg width="40" height="150" viewBox="0 0 40 150" style="position: absolute; top: 0; left: 0;">
+                        <!-- Stem -->
+                        <line x1="20" y1="150" x2="20" y2="80" stroke="#228B22" stroke-width="2"/>
+                        <!-- Petals -->
+                        <ellipse cx="20" cy="40" rx="8" ry="25" fill="hsl(${index * 30}, 100%, 50%)" opacity="0.9"/>
+                        <ellipse cx="10" cy="50" rx="6" ry="20" fill="hsl(${index * 30 + 20}, 100%, 50%)" opacity="0.8"/>
+                        <ellipse cx="30" cy="50" rx="6" ry="20" fill="hsl(${index * 30 - 20}, 100%, 50%)" opacity="0.8"/>
+                    </svg>
+                `;
+                
+                tulipEl.style.transform = `rotate(${pos.angle}rad) translateX(${pos.x}px) translateY(${pos.y}px)`;
+                tulipEl.style.opacity = '0';
+                tulipEl.style.animation = `tulipAppear 0.8s ease-out ${index * 0.1}s forwards`;
+
+                bouquet.appendChild(tulipEl);
+            });
+
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes tulipAppear {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(50px) rotateZ(20deg);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translateY(0) rotateZ(0deg);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // ===== STAGE 3 Bouquet Click =====
+        document.getElementById('bouquet').addEventListener('click', function() {
+            document.getElementById('stage3').classList.remove('visible');
+            document.getElementById('messageContainer').classList.add('visible');
+        });
+
+        // ===== STAGE 4: Close Message =====
+        document.getElementById('closeMessageBtn').addEventListener('click', function() {
+            document.getElementById('messageContainer').classList.remove('visible');
+            // Optional: Reset to beginning
+            // location.reload();
+        });
+
+        // ===== Handle Window Resize =====
+        window.addEventListener('resize', function() {
+            if (document.getElementById('stage2').classList.contains('visible')) {
+                drawGarden();
+            }
+        });
+    </script>
+</body>
+</html>
